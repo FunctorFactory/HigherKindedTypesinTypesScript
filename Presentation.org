@@ -1,6 +1,6 @@
 #+title: Higher Kinded Types in Typescript
 #+author: Jake Shilling
-#+email: jshilling@functorfactory.org
+#+email: jshilling@functorfactory.com
 
 * Math <-> Computer Science
 
