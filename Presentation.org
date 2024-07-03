@@ -1,0 +1,176 @@
+#+title: Higher Kinded Types in Typescript
+#+author: Jake Shilling
+#+email: jshilling@functorfactory.org
+
+* Math <-> Computer Science
+
+[[https://youtu.be/IOiZatlZtGU?si=8rxDlf1rHL9zGL7Z][Propositions as Types by Philip Wadler]]
+
+[[./assets/PropositionsAsTypes.png]]
+
+* Inconsistency in Vocabulary
+
+As developers we are regularly using ideas from multiple fields, which means our
+jargon ends up meaning lots of different things all at the same time.
+
+Ex: What is a "Function"?
+
+| In Math                               | In Computer Science          |
+|---------------------------------------+------------------------------|
+| A mapping between domain and codomain | A list of instructions       |
+|---------------------------------------+------------------------------|
+| Always idempotent                     | Can alter program state      |
+|---------------------------------------+------------------------------|
+| Only one argument                     | Arbitrary number of augments |
+
+These inconsistencies end up affecting our mental model of what these ideas
+/are/ and therefore dictates our design choices.
+
+* What are "Types"?
+
+#+begin_quote
+  A type system is a tractable syntactic method for proving the absence of certain
+  behaviors by classifying phrases according to the kinds of values they compute.
+#+end_quote
+[cite:@pierceTypesProgrammingLanguages2002]
+
+For computers:
+
+- Helps determine compiler output (or how a VM handles an operation)
+
+- Excludes some incorrect programs
+
+- Types are ultimately about structure and representation
+
+For math:
+
+- Types are sets of mathematical objects
+
+- Mathematical objects have no structure (more or less)
+
+* TypeScript is Happy with Math
+
+- We talk about /unions/ and /intersections/
+
+- Structural typing lets use think about subsets and super sets
+
+- We can easily think of TypeScript types as sets of valid values:
+
+  - ~boolean~ = { ~true~, ~false~ }
+
+  - ~number~ = ℝ
+
+  - ~Array<T>~ = ?????
+
+* We need a new word for types that are not types
+
+Type theory refers to the "Type of a Type" as a /Kind/.
+
+- ~boolean~ has the /Kind/ ~*~
+
+- ~Array<T>~ has the /Kind/ ~* → *~ 
+
+- ~Array<T>~ is a type level function
+
+* Functions have special powers. Do Kinds have special powers?
+
+We can abstract functions into higher order functions:
+
+#+begin_src typescript
+const map = <A, B>(self: Array<A>, f: (a: A) => B): Array<B> = self.map(f)
+#+end_src
+
+What if we could abstract /kinds/ into /higher order kinds/
+
+#+begin_src typescript
+const map = <F, A, B>(self: F<A>, f: (a: A) => B): F<B> = ????
+#+end_src
+
+* Defunctionalization
+
+There was this paper called [[https://www.cl.cam.ac.uk/~jdy22/papers/lightweight-higher-kinded-polymorphism.pdf][Lightweight kigher-kinded polymorphism]] that
+implemented this pattern in OCaml with an approach that also works in
+TypeScript.
+
+Steps:
+
+1. Implement a generic type that can act like a lookup table
+
+2. Create a way to represent shared behavior between kinds
+
+3. ???
+
+4. Profit
+
+* Adventures in ~this~
+
+#+begin_src typescript
+export interface MyInterface {
+    x: unknown,
+    y: this['x']
+}
+
+export interface MyInterface2 extends MyInterface {
+    x: number;
+}
+
+type X1 = MyInterface['x']
+type Y1 = MyInterface['y']
+
+type X2 = MyInterface2['x']
+type Y2 = MyInterface2['y']
+#+end_src
+
+* HKT
+
+#+begin_src typescript
+export interface HKT {
+    readonly _A?: unknown;
+    readonly _type?: unknown;
+}
+
+export type Kind<F extends HKT, A> = (F & { _A: A })['_type'];
+
+export interface ArrayKind extends HKT {
+    readonly _type: Array<this['_A']>;
+}
+
+export type NumArray = Kind<ArrayKind, number>; //=> number[]
+#+end_src
+
+* Shared Behavior
+
+#+begin_src typescript
+export interface Functor<F extends HKT> {
+    readonly map: <A, B>(self: Kind<F, A>, f: (a: A) => B) => Kind<F, B>
+}
+
+export const stringify = <F extends HKT> (
+    T: Functor<F>
+) => (
+    self: Kind<F, number>
+): Kind<F, string> => {
+    return T.map(self, n => `${n}`)
+}
+#+end_src
+
+* Profit
+
+#+begin_src typescript
+export const ArrayFunctor: Functor<ArrayKind> = {
+    map: (self, f) => self.map(f)
+}
+
+export const stringifyNumArray = stringify(ArrayFunctor);
+
+stringifyNumArray([1, 2, 3]) // => ['1', '2', '3']
+#+end_src
+
+* Links
+
+[[https://dev.to/effect/encoding-of-hkts-in-typescript-5c3][Encoding HKTs in TypeScript (Once Again)]]
+[[https://effect.website/docs/other/behaviour/hkt][Effect on HKT]]
+[[https://gcanti.github.io/fp-ts/guides/HKT.html][FP-TS on HKT]]
+[[https://www.cl.cam.ac.uk/~jdy22/papers/lightweight-higher-kinded-polymorphism.pdf][Lightweight kigher-kinded polymorphism]]
+[[https://youtu.be/IOiZatlZtGU?si=8rxDlf1rHL9zGL7Z][Propositions as Types by Philip Wadler]]
+[[https://www.amazon.com/Types-Programming-Languages-MIT-Press/dp/0262162091][Types and Programming Languages]]
