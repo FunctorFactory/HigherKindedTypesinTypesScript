@@ -168,9 +168,9 @@ stringifyNumArray([1, 2, 3]) // => ['1', '2', '3']
 
 * Links
 
-[[https://dev.to/effect/encoding-of-hkts-in-typescript-5c3][Encoding HKTs in TypeScript (Once Again)]]
-[[https://effect.website/docs/other/behaviour/hkt][Effect on HKT]]
-[[https://gcanti.github.io/fp-ts/guides/HKT.html][FP-TS on HKT]]
-[[https://www.cl.cam.ac.uk/~jdy22/papers/lightweight-higher-kinded-polymorphism.pdf][Lightweight kigher-kinded polymorphism]]
-[[https://youtu.be/IOiZatlZtGU?si=8rxDlf1rHL9zGL7Z][Propositions as Types by Philip Wadler]]
-[[https://www.amazon.com/Types-Programming-Languages-MIT-Press/dp/0262162091][Types and Programming Languages]]
+- [[https://dev.to/effect/encoding-of-hkts-in-typescript-5c3][Encoding HKTs in TypeScript (Once Again)]]
+- [[https://effect.website/docs/other/behaviour/hkt][Effect on HKT]]
+- [[https://gcanti.github.io/fp-ts/guides/HKT.html][FP-TS on HKT]]
+- [[https://www.cl.cam.ac.uk/~jdy22/papers/lightweight-higher-kinded-polymorphism.pdf][Lightweight kigher-kinded polymorphism]]
+- [[https://youtu.be/IOiZatlZtGU?si=8rxDlf1rHL9zGL7Z][Propositions as Types by Philip Wadler]]
+- [[https://www.amazon.com/Types-Programming-Languages-MIT-Press/dp/0262162091][Types and Programming Languages]]
